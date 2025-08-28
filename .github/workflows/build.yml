@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: 'Build (${{ matrix.os }})'
+    runs-on: '${{ matrix.os }}'
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+          - macos-15
+          - windows-latest
+
+    steps:
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Checkout and sync repos
+        uses: Chizkiyahu/ai-ml-sdk-manifest/.github/actions/checkout-and-sync@main
+        with:
+          repo_groups: scenario-runner
+          ai-ml-sdk-scenario-runner_owner: ${{ github.repository_owner }}
+          ai-ml-sdk-scenario-runner_revision: ${{ github.sha }}
+
+      - name: Build (macOS/Linux)
+        if: runner.os != 'Windows'
+        working-directory: sw/scenario-runner
+        run: python scripts/build.py
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        working-directory: sw/scenario-runner
+        run: python scripts/build.py
