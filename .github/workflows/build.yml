@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - test_fix
   pull_request:
 
 permissions:
@@ -37,6 +38,7 @@ jobs:
           repo_groups: scenario-runner
           overrides: |
               ${{ github.repository }}@${{ github.sha }}
+              Chizkiyahu/ai-ml-sdk-vgf-library@main
 
       - name: Build (macOS/Linux)
         if: runner.os != 'Windows'
